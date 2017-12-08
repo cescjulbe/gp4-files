@@ -42,43 +42,51 @@ public class QualiFileReader {
 		    // Each line starting...
 			while (line != null) {
 				
-				String[] tokens = line.trim().split(" ");
-				
-				for (String str : tokens) {
-					if (!str.equals("")) {
-						// Checking times
-						if (str.matches("1m")) {
-							minute = str.replace("m", ".");
-							hasTime = true;
-						}
-						if (str.matches("..\\....s")) {
-							seconds = str.replace("s", "");
-						}
-						if (lineCounter > 7) {							
-							if (	str.matches("[a-zA-Z]{1,}") && 
-									!str.equals(KEYWORDS[0]) 	&& 
-									!str.equals(KEYWORDS[1])) 	{								
-								names.add(str);
-							}
-						}
+				if(lineCounter > 8) {
+					if(lineCounter%2==1) {
+						// PILOTO
+						if(line.trim().length()>1)
+							names.add(line.trim());
 					}
-				}
-				if (hasTime) {
-					times.add(minute + seconds);
-					hasTime=false;
-					floatTimes.add(Float.parseFloat(minute)*60 + Float.parseFloat(seconds));
-				}
+					else {
+						String[] tokens = line.trim().split(" ");
+						
+						for (String str : tokens) {
+							if (!str.equals("")) {
+								// Checking times
+								if (str.matches("1m")) {
+									minute = str.replace("m", ".");
+									hasTime = true;
+								}
+								if (str.matches("..\\....s")) {
+									seconds = str.replace("s", "");
+								}/*
+								if (lineCounter > 7) {							
+									if (	str.matches("[a-zA-Z]{1,}") && 
+											!str.equals(KEYWORDS[0]) 	&& 
+											!str.equals(KEYWORDS[1])) 	{								
+										names.add(str);
+									}
+								}
+								*/
+							}
+						}						
+					}
+					if (hasTime) {
+						times.add(minute + seconds);
+						hasTime=false;
+						floatTimes.add(Float.parseFloat(minute)*60 + Float.parseFloat(seconds));
+					}
+			    }
 		        line = br.readLine();
 		        lineCounter++;
-		    }
-			
-			int iterCounter =0;
-			for (int i=0; i<names.size(); i=i+2) {
-				parsedFile[iterCounter][0]=String.valueOf(iterCounter+1);
-				parsedFile[iterCounter][1]=names.get(i)+ " " + names.get(i+1);
-				parsedFile[iterCounter][2]=times.get(iterCounter);
-				parsedFile[iterCounter][3]=String.valueOf(floatTimes.get(iterCounter));
-				iterCounter++;
+			}	
+
+			for (int i=0; i<names.size(); i++) {
+				parsedFile[i][0]=String.valueOf(i+1);
+				parsedFile[i][1]=names.get(i);
+				parsedFile[i][2]=times.get(i);
+				parsedFile[i][3]=String.valueOf(floatTimes.get(i));
 			}
 			return getParsedData(parsedFile);
 
